@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const moment = require('moment-timezone')
-const dateMexico = moment.tz(Date.now(), 'America/Mexico_City')
+//const dateMexico = moment.tz(Date.now(), 'America/Mexico_City')
 
 const ScansSchema = new mongoose.Schema({
   scanedBy: {
@@ -10,7 +10,7 @@ const ScansSchema = new mongoose.Schema({
   },
   scanDate: {
     type: Date,
-    default: dateMexico
+    default: moment.tz(Date.now(), 'America/Mexico_City')
   },
   qr: {
     type: String,

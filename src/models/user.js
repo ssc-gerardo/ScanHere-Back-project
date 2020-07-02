@@ -35,7 +35,7 @@ const userSchema = mongoose.Schema({
     required: true
   },
   rewards: {
-    type: Object
+    type: String
   },
   roll: {
     type: String,
