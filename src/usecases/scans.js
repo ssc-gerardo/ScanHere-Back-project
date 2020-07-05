@@ -23,6 +23,7 @@ function updateById (id, scanData) {
 }
 
 function getScanByUserAndPromotionId (userId, promotionId) {
+  if (!userId) throw Error('userId is required')
   return scan.find({
     promotion: promotionId,
     scanedBy: userId

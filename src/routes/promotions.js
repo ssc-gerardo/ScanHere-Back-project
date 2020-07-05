@@ -111,7 +111,7 @@ router.get('/:promotionId/scans', async (request, response) => {
     const token = request.header('Authorization')
     const payload = token.split('.')[1]
     const decodedPayload = atob(payload)
-    const userId = decodedPayload.id
+    const { id: userId } = JSON.parse(decodedPayload)
     const { promotionId } = request.params
     const allscans = await scans.getScanByUserAndPromotionId(userId, promotionId)
     response.json({
