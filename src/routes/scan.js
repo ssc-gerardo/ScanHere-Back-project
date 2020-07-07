@@ -3,14 +3,13 @@ const atob = require('atob')
 
 const scans = require('../usecases/scans')
 const products = require('../usecases/products')
+const promotions = require('../usecases/promotions')
 
 const auth = require('../middleware/auth')
 
 const router = express.Router()
 
-router.use(auth)
-
-router.get('/', async (request, response) => {
+router.get('/', auth, async (request, response) => {
   try {
     const allscans = await scans.getAll()
     response.json({
@@ -28,7 +27,7 @@ router.get('/', async (request, response) => {
   }
 })
 
-router.post('/', async (request, response) => {
+router.post('/', auth, async (request, response) => {
   try {
     // get product id
     const qr = request.body.qr
@@ -69,7 +68,35 @@ router.post('/', async (request, response) => {
   }
 })
 
-router.delete('/:id', async (request, response) => {
+router.get('/:qr/promotions', async (request, response) => {
+  try {
+    // get product id
+    const qr = request.params.qr
+    const decryptedData = atob(qr)
+    const scanData = JSON.parse(decryptedData)
+    const product = await products.getBySku(scanData.sku)
+    // Checar si el QR ya ha sido registrado
+    const usedQr = await scans.getByQr(qr)
+    if (usedQr) {
+      throw Error('Codigo QR ya usado')
+    }
+    const promotionsFound = await promotions.getPromosByProductId(product._id)
+    response.json({
+      success: true,
+      message: 'Scan verificated, and his promotions',
+      data: {
+        promotions: promotionsFound
+      }
+    })
+  } catch (error) {
+    response.json({
+      success: false,
+      error: error.message
+    })
+  }
+})
+
+router.delete('/:id', auth, async (request, response) => {
   try {
     const { id } = request.params
     const scanDeleted = await scans.deleteById(id)
@@ -89,7 +116,7 @@ router.delete('/:id', async (request, response) => {
   }
 })
 
-router.patch('/:id', async (request, response) => {
+router.patch('/:id', auth, async (request, response) => {
   try {
     const { id } = request.params
     const scanUdated = await scans.updateById(id, request.body)
