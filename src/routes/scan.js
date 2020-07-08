@@ -9,7 +9,9 @@ const auth = require('../middleware/auth')
 
 const router = express.Router()
 
-router.get('/', auth, async (request, response) => {
+router.use(auth)
+
+router.get('/', async (request, response) => {
   try {
     const allscans = await scans.getAll()
     response.json({
@@ -27,7 +29,7 @@ router.get('/', auth, async (request, response) => {
   }
 })
 
-router.post('/', auth, async (request, response) => {
+router.post('/', async (request, response) => {
   try {
     // get product id
     const qr = request.body.qr
@@ -96,7 +98,7 @@ router.get('/:qr/promotions', async (request, response) => {
   }
 })
 
-router.delete('/:id', auth, async (request, response) => {
+router.delete('/:id', async (request, response) => {
   try {
     const { id } = request.params
     const scanDeleted = await scans.deleteById(id)
@@ -116,7 +118,7 @@ router.delete('/:id', auth, async (request, response) => {
   }
 })
 
-router.patch('/:id', auth, async (request, response) => {
+router.patch('/:id', async (request, response) => {
   try {
     const { id } = request.params
     const scanUdated = await scans.updateById(id, request.body)
