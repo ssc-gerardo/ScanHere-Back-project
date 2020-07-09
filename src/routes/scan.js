@@ -45,11 +45,11 @@ router.post('/', async (request, response) => {
     // get user id
     const token = request.header('Authorization')
     const payload = token.split('.')[1]
-    const decodedPayload = atob(payload)
+    const decodedPayload = JSON.parse(atob(payload))
     const userId = decodedPayload.id
 
     const newScan = await scans.create({
-      ScanedBy: userId,
+      scanedBy: userId,
       qr,
       product: product._id,
       promotion: request.body.promotionId
