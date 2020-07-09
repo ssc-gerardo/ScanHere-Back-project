@@ -3,6 +3,7 @@ const atob = require('atob')
 
 const scans = require('../usecases/scans')
 const products = require('../usecases/products')
+const promotions = require('../usecases/promotions')
 
 const auth = require('../middleware/auth')
 
@@ -44,11 +45,11 @@ router.post('/', async (request, response) => {
     // get user id
     const token = request.header('Authorization')
     const payload = token.split('.')[1]
-    const decodedPayload = atob(payload)
+    const decodedPayload = JSON.parse(atob(payload))
     const userId = decodedPayload.id
 
     const newScan = await scans.create({
-      ScanedBy: userId,
+      scanedBy: userId,
       qr,
       product: product._id,
       promotion: request.body.promotionId
@@ -59,6 +60,34 @@ router.post('/', async (request, response) => {
       message: 'Scan registered',
       data: {
         scan: newScan
+      }
+    })
+  } catch (error) {
+    response.json({
+      success: false,
+      error: error.message
+    })
+  }
+})
+
+router.get('/:qr/promotions', async (request, response) => {
+  try {
+    // get product id
+    const qr = request.params.qr
+    const decryptedData = atob(qr)
+    const scanData = JSON.parse(decryptedData)
+    const product = await products.getBySku(scanData.sku)
+    // Checar si el QR ya ha sido registrado
+    const usedQr = await scans.getByQr(qr)
+    if (usedQr) {
+      throw Error('Codigo QR ya usado')
+    }
+    const promotionsFound = await promotions.getPromosByProductId(product._id)
+    response.json({
+      success: true,
+      message: 'Scan verificated, and his promotions',
+      data: {
+        promotions: promotionsFound
       }
     })
   } catch (error) {

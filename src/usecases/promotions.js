@@ -22,6 +22,9 @@ function deleteById (id) {
 function updateById (id, scanData) {
   return promotion.findByIdAndUpdate(id, scanData)
 }
+function getPromosByProductId (prodctId) {
+  return promotion.find({ productInfo: prodctId }).populate('productInfo')
+}
 
 module.exports = {
   getAll,
@@ -29,5 +32,6 @@ module.exports = {
   getById: getAPromo,
   deleteById,
   updateById,
-  getAPromo
+  getAPromo,
+  getPromosByProductId
 }
